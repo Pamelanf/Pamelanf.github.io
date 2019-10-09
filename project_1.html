@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>Machine Learning Technique for Stock Market Prediction</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main1.css" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<!-- <header id="header">
+				<div class="inner">
+					<a href="#" class="image avatar"><img src="images/avatar.jpg" alt="" /></a>
+					<h1><strong>Hello my name is Pamela N. Flores </strong> <br />
+					I am passionate in Data Science<br />
+					 "Big Data, Data Mining", Business Intelligence, and excited to still learning in this fascinated field.  <br />
+					</a>.</h1>
+				</div>
+			</header> -->
+
+		<!-- Main -->
+			<div id="main">
+
+				<!-- One -->
+					<section id="one">
+						<header class="major">
+							<h1 align="center">Implementation of Machine Learning Techniques for Stock Market Prediction<br />
+													Study Case: 100 NASDAQ Companies</h1>
+						</header>
+
+						<p>As many of us know the Stock Market price is influenced by many factors such a demand and supply, interest rates, investors sentiment and others, so there is no perfect equation to know exactly how share prices will behave, nevertheless, we can leverage Machine Learning Techniques to make more accurate predictions.<br />
+							There are many Machine Learning techniques that we can use for this purpose like Moving Average, Linear Regression, k-Nearest Neighbors, Auto ARIMA, and Deep Learning Technique "Recurrent Neural Network" with its modification Long Short Term Memory (LSTM); though, we are going to focus on Auto ARIMA and RNN - LSTM as in previous works these two showed the best performance at the moment of predict stock market prices.
+							The approach, we will use in this project is Technical Analysis, so the past values of the stock prices will be analysed, in order to find out whether the future stock prices will go up or down.</p>
+
+						<h2><strong>  Project Developing </strong></h2>
+						<p>Machine Learning Techniques comprises the next six phases: Gathering Data, Pre-processing techniques which comprise of "Data Cleaning, Encoding Categorical Dataset, Splitting the dataset into training and testing set, and Feature Scaling", Choosing a Model, Training, Testing (Hyperparameter tuning) and Evaluation, so we will go through these six phases.</p>
+
+						<h3><strong> Phase I - Gathering Data:</strong> </h3>
+						<p>The data we are going to use is from 100-NASDAQ non-financial companies from Jan 4, 2010, to April 12 2019.
+						The acquisition of this data will be automated through a python program, doing first web scraping in Wikipedia <a href = "https://en.wikipedia.org/wiki/NASDAQ-100"> "https://en.wikipedia.org/wiki/NASDAQ-100" </a> to get a large list of 100 NASDAQ companies tickers, then with this list from Yahoo Financial web page, we will pull in masse historical stock market data of these companies, to finally perform the analysis of each company, so we need to import the next python libraries.</p>
+						<p> <strong> Request --> </strong> With this library, an HTTP request is sent to Wikipedia <a href="https://en.wikipedia.org/wiki/NASDAQ-100"> "https://en.wikipedia.org/wiki/NASDAQ-100" </a> to get the source code.<br />
+							<strong> Beautiful Soup "bs" --> </strong>Once we get the source code with "bs" web scraping is performed, to find these 100 tickers and keep it in a list object "ticker[]". <br />
+							<strong> Pickle --> </strong>The tickers founded are serialized and save in a "nasdaq100tickers.pickle".<br />
+							<strong> Datetime --></strong>to specify from what date to what date pull the data. In this case from Jan 2010 to April 2019.<br />
+							<strong> Panda "pd" --> </strong>To manipulate data.<br />
+							<strong> Panda_datareader.data "web" --> </strong>To pull data from Yahoo Finance.</p>
+						<p> As a result, we have one hundred .csv files (each one by company) with historical stock market data information stored in our local machine; after doing some data exploration each .csv file is composed by 2335 instances and seven
+							attributes <strong> Date, Low price, Open price, Close price, Volume price, and Adjusted close price</strong>, as we are just interested in analysing the date and Adjusted close price attributes we are going to drop out the other ones, and join all the
+							CSV files in one CSV file "nasdaq100_joined_closes.csv", check out <a href= "https://github.com/Pamelanf/Machine-Learning-Technique-for-Stock-Market-Prediction/blob/master/Final/nasdaq100%20dataset.ipynb">"here" </a> to see the full code of it
+							and for more detailed explanation you can refer <a href = "https://pythonprogramming.net/sp500-company-price-data-python-programming-for-finance/">"here"</a></p>
+
+						<h3><strong> Phase II - Pre-processing Techniques: </strong> </h3>
+						<p> To perform pre-processing techniques in our dataset the next python libraries are needed:<br />
+						   <strong> Pandas library --> </strong>To extract, transform and analyse data.<br />
+						   <strong> Numpy library --></strong>To manage arrays processing.<br />
+						   <strong>Scikit Learning --></strong>This is a machine learning library for data mining and data analysis.<br />
+						   <strong>Mat plot lib --> </strong>To plot graphs.<br />
+						   <strong>Plotly Python --> </strong> It is a graphic library to make interactive, quality online graphs. </p>
+						<p> We load our dataset as a dataframe with the use of pandas, to explore and have an idea of it; as we can see in the below figure,
+						the dataset is composed by 2335 instances (rows) of 100 companies (columns), also is important to point out the date column is established as an index because the order in time series is important.</p>
+						<center><img src="images/thumbs/A.jpg" alt="" style="width:900px;height:298px;"></center>
+								<h3 align="center">Dataset "nasdaq100_joined_closes.csv"</h3>
+						<p> From this stage Amazon "AMZN" company will be examined, so all other columns will be dropped out.</p>
+						<center><img src="images/thumbs/B.jpg" alt="" style="width:900px;height:298px;"></center>
+								<h3 align="center">Amazon Stock Market</h3>
+						<p> The above figure shows that prices than more 4 years back are likely to be irrelevant., hence, the analysis will be performed from 2015, so doing this last general transformation,
+							the final dataset shape is composed of 1077 instances and one column(AMZN). The next step is splitting the dataset in training and testing dataset. We will do this with "iloc" method
+							of pandas libraries, assigning 95 % for the training dataset and 5% for the testing dataset, hence, there are 1027 instances for the training set and 50 instances for the testing dataset as shown in below picture.</p>
+						<center><img src="images/thumbs/C.jpg" alt="" style="width:900px;height:298px;"></center>
+								<h3 align="center"> Split of  training and testing dataset</h3>
+						<p> The final pre-processing techniques are data transformation (Scaling and Reshaping), however, this step depends on what machine learning technique will be applied.</p>
+
+						<h3><strong> Phase III - Choosing a Model: </strong> </h3>
+						<p>As we mentioned before two models will be explored Auto-Arima and Long Short Term Memory "LSTM" to analyse their performance in the prediction of the stock market fluctuation of Amazon Company.</p>
+
+						<h3><strong> Phases "IV - Training" -  "V and IV - Testing and Evaluating":  </strong> </h3>
+						<p>These three phases go together because we have to first train our model, and then evaluate it, and according to the results we test our model varying parameters and training again and
+						evaluating again and so on until we find the model which performs the best, and for evaluating our model the metric Root Mean Squared Error "RMSE" will be used.</p>
+
+
+						<h3><strong> Auto-Arima Model: </strong> </h3>
+						<h3><strong> Phases IV - Training  </strong> </h3>
+						<p> Applying "statsmodels" python library our time series dataset is deconstructed into three components: Trend, seasonal, and residual.</p>
+						<center><img src="images/thumbs/D.jpg" alt="" style="width:900px;height:350px;"></center>
+								<h3 align="center">Plot of final dataset separated into its trend, seasonal, and residual components.</h3>
+						<p>In the above figure, we can see an upward trend from 2018, also a seasonal component, hence, it is needed to use seasonal Arima model, so we have to select the best combination
+							of (p, d, q) values for ARIMA model and (P, D, Q) values for the seasonal component; with pyramid.arima python library we perform this task in our training dataset with just one line of code as it is shown below:</p>
+						<center><img src="images/thumbs/E.jpg" alt="" style="width:900px;height:298px;"></center>
+								<h3 align="center">Code snippet of initial configuration and Test 1 configuration.</h3>
+						<p> This library comprises of auto_arima function, that autotune a range of (p, d, q) and (P, D, Q) values and then fit the model for all these combinations, choosing the best combination according to the lowest AIC.
+							As you can see in the above code snippet auto_arima function has many parameters which could be changed in order to get better results; to see a detail explanation of these parameters please refer <a href= “http://www.alkaline-ml.com/pmdarima/0.9.0/modules/generated/pyramid.arima.auto_arima.html”> "http://www.alkaline-ml.com/pmdarima/0.9.0/modules/generated/pyramid.arima.auto_arima.html"</a>
+							After training our model, we need to fit it with "fit" function "Arima_model.fit(training_set)", finally, our model is ready to make predictions.</p>
+
+						<h3><strong> Predicting Future Stock:  </strong> </h3>
+						<p>Once our model is trained and fitted we can make predictions, in Arima model this is pretty simple with the next line of code:</p>
+						<h4 align="center"><strong>"forecasting = Arima_model.predict(n_periods=len(testing_set))"</strong></h4>
+						<p>Where we will use the same length of our testing dataset because we want to make predictions in the same period of this testing dataset, in order to compare the predicted values against the real values.</p>
+
+						<h3><strong> Phase V and IV - Testing and Evaluating: </strong> </h3>
+						<p>For our testing session, first we changed the percentage split of our training and testing set, and over the percentage split that threw the best result, we changed Autorima's parameters,
+						   as a result of this, the model with the best performance is with a splitting percentage of 98.7 % (1063 instances) for training dataset, and 1.3% (14 instances) for testing dataset, and
+						   with a configuration of auto_arima's parameters specified in this <a href = "images/thumbs/E.jpg"> image</a>, with a RMSE of 30.36.</p>
+						 <p> The below figure shows a comparison of the predicted values against the real values. Please refer to my <a href= "https://github.com/Pamelanf/Machine-Learning-Technique-for-Stock-Market-Prediction/blob/master/Final/AUTOARIMA-14%20test%201%20part%20B.ipynb">"github" </a> to see the full code.
+						<center><img src="images/thumbs/F.jpg" alt="" style="width:950px;height:450px;"></center>
+								<h3 align="center">Auto-Arima Model-Comparison of Predicted values against the real values.</h3>
+
+						<h3><strong> Recurrent Neural Network "LSTM" Model: </strong> </h3>
+						<p> In order to train this model, we will need to perform more data transformation (pre-processing techniques) that we did not perform in Arima model. </p>
+
+						<h3><strong> Phases IV - Training:  </strong> </h3>
+						<p> First we are going to perform the next pre-processing techniques:</br>
+						<strong> Feature scaling: </strong>
+							As our dataset is large, when applying this to a neural network will cause the network learning to slow down, therefore, this step is needed to have a better performance in our neural network. To accomplish this,
+						    we use python Scikit-Learn "MinMaxScaler" to scale the values of our training dataset between zero and one; this scaled data is kept in "training_set_scaled" variable.</br>
+						<strong> Reshaping: </strong> The LSTM input has to be a 3-dimensional array, these three dimensions are number of samples (batch size), number of time steps and number of observation at time step(feature). As our training dataset
+							is 2D array, therefore, we need to reshape it. First, with our "training_set_scaled" we create a list X_train [] of 60-time steps then this list is converted into numpy array using NumPy library, to finally convert this
+							into 3D dimension array with 60-time steps and one observation at a timestep.</p>
+						<center><img src="images/thumbs/G.jpg" alt="" style="width:900px;height:250px;"></center>
+								<h3 align="center">Code snippet to create input 3-dimensional array.</h3>
+						<p> Now our input is 3D array (967, 60, 1)  967 --> number of series (batch size), 60 --> number of time steps and one feature at each time ep.</p>
+						<h3><strong> Building the RNN network "LSTM":  </strong> </h3>
+						<p>To build our neural network the next keras neural network libraries need to be imported: Sequential to initialize the neural network, Dense to add and connect a dense neural network layer, LSTM to add a Long Short Term Memory,
+						Dropout to add a dropout layer to avoid overfitting, and Activation function which has to be set just in output layer. Now we construct our neural network adding the first neural network LSTM layer and its respective dropout layer,
+						then the hidden LSTM layer and its respective dropout layer and finally the Dense output layer.
+						<center><img src="images/thumbs/H.jpg" alt="" style="width:850px;height:298px;"></center>
+								<h3 align="center">Code snippet "Building Recurrent neural network- LSTM"</h3>
+						<p>Afterwards, we compile our model to optimise the learning rate with Adam optimizer; loss="mean_squarred error" computes the mean of the squared errors and other metrics. Finally, we fit our model with our 3D input, "y_train"
+						to run on 18 epochs with a batch size of 128.</p>
+						<h3><strong> Predicting Future Stock:  </strong> </h3>
+						<p>Once our model is trained and fitted we can make predictions, however, in LSTM model we need to transform and reshape the input data as we did in previous steps. We will use the length of our testing dataset to make predictions
+						   in the same period of this testing dataset in order to compare the predicted against the real values, please refer to <a href="https://github.com/Pamelanf/Machine-Learning-Technique-for-Stock-Market-Prediction/blob/master/Final/RNN%20-%20LSTM-%20THE%20BEST.ipynb">"my github"</a> to see the full code.</p>
+						<h3><strong> Phase V - Testing:   </strong> </h3>
+						<p>To test our model first, we are going to vary the percentage of training and testing set and second, we are going to vary the parameters of our model with hyperparameters, and to evaluate our model the metric Root Mean Squared
+						Error "RMSE" will be used. Furthermore, a visualization tool called TensorBoard will be used to visualize the performance of our model, this tool uses Loss and Accuracy metrics to evaluate the model performance.</br>
+						The same as Arima Model the model performs better with a splitting percentage of 98.7 % (1063 instances) of the training dataset, and 1.3% (14 instances) of testing set, so we are going to perform hyperparameters with this division.</p>
+						<h3><strong> Hyperparameters:  </strong> </h3>
+						<p>With the help of hyperparameters we will train our model many times with different combinations of LSTM's parameters. The parameters that we are going to combine are the number of first_neurons = [50, 100, 150], hidden_neurons = [50, 100],
+						batches_size = [64, 128], and epochs = [18, 25, 35]. These four parameters will create 54 combinations. For example, one combination will be 18 epochs, 64 batch size, 50 hidden neurons and so on. The next piece of code iterates over these
+						parameters and make these combinations.<p>
+						<center><img src="images/thumbs/I.jpg" alt="" style="width:750px;height:150px;"></center>
+								<h3 align="center"> Code Snipped - Hyperparameters</h3>
+						<p>Each iteration will train the model, so at the end, we are going to have 54 training sessions which mean 54 models each one with different parameters combinations.</p>
+						<h3><strong> Phase VI - Evaluation:   </strong> </h3>
+						<p>With the help of a visualization tool called Tensorboard we are going to evaluate our models, so we are going to analyse each training session (model) to be able to
+						choose the model with the best performance, thus, we need to import TensorBoard from keras and put the next lines of code in the middle of the code that we use to build our neuronal network "LSTM".</p>
+
+						<p><strong> NAME = "{}-epoch-{}-batch-{}-hidden_neuron-{}-first_neuron-{}".format(epoch, batch_size1, hidden_neuron, first_neuron, int(time.time())) --> </strong>
+								with this, we create the name format of our files that will hold the logs of each training session.<br />
+						<strong> tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))--></strong>With this, the log directory is created.<br />
+						<strong>callbacks=[tensorboard]--></strong>Whith this, tensorboard is called.</p>
+
+						<p>While our 54 training sessions are running we can access to tensorboard link to visualize the performance of each training session, see figure below.</p>
+						<center><img src="images/thumbs/J.jpg" alt="" style="width:800px;height:350px;"></center>
+								<h3 align="center">Tensorboard - 54 training sessions (models).</h3>
+						<p>Here our interest is in loss metric, the lowest value of this will deliver the best model with the best performance. Analysing these 54 models have founded
+						eight combinations with lowest values of loss; in figure below, we can see these combinations and its respective value of loss metric.</p>
+						<center><img src="images/thumbs/K.jpg" alt="" style="width:800px;height:350px;"></center>
+								<h3 align="center">Eight models with the best performance.</h3>
+						<p>From these 8 models the combination with "18-epoch-64-batch-150-hidden_neuron-150-first_neuron"
+						have the best performance with Loss value of 1.2379 and RMSE of 18.47, as we can notice as well this RMSE value is better than RMSE value produced by Auto-Arima model,
+						please refer to <a href = "https://github.com/Pamelanf/Machine-Learning-Technique-for-Stock-Market-Prediction/blob/master/Final/TENSORBOARD%20AND%20HYPERPARAMETERS.ipynb"> "my github" </a>
+						to see the full code. The figure below shows a comparison of the predicted values against the real values.</p>
+
+						<center><img src="images/thumbs/L.jpg" alt="" style="width:800px;height:350px;"></center>
+								<h3 align="center">Best Result of LSTM Model</h3>
+
+						<h3><strong> Inference:  </strong> </h3>
+						<p>In this project, we explored the application of two machine learning techniques Auto-Arima model and Recurrent Neural Network "LSTM" Model, in order to analyse their performance in the prediction
+						of stock's price of 100 NASDAQ companies; these two models forecasted the stock's price of Amazon Company which is one of the companies of 100 NASDAQ.</br>
+						The outcome of our training and evaluation sessions is that the model with the best performance is Recurrent Neural Network "LSTM" with a value of RMSE = 18.47, however, the future stocks' price values
+						predicted with this model were not so precise, because we only analysed past stocks' price information and we didn't take into account other factors that affect the stock market prices. Hence, our model
+						makes accurate predictions of the fluctuation of the stocks' price, rather than make accurate predictions of the stocks' price values.</p>
+
+					</section>
+
+				<!-- Two-->
+						<ul class="actions">
+												<li><a href="index.html" class="button">HOME</a></li>
+						</ul>
+
+
+			</div>
+
+
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.poptrox.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
