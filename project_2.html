@@ -1,0 +1,648 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>Performing computation on Real-Time Views with Apache Spark’s Streaming API</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main1.css" />
+	</head>
+	<body class="is-preload">
+
+		<div id="fb-root"></div>
+				<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v5.0">
+		</script>
+
+		<!-- Header -->
+			<!-- <header id="header">
+				<div class="inner">
+					<a href="#" class="image avatar"><img src="images/avatar.jpg" alt="" /></a>
+					<h1><strong>Hello my name is Pamela N. Flores </strong> <br />
+					I am passionate in Data Science<br />
+					 "Big Data, Data Mining", Business Intelligence, and excited to still learning in this fascinated field.  <br />
+					</a>.</h1>
+				</div>
+			</header> -->
+
+		<!-- Main -->
+			<div id="main">
+
+				<!-- One -->
+					<section id="one">
+						<header class="major">
+							<h1 align="center"><font color= "000000">Performing computation on Real-Time Views with Apache Spark's <br />
+													Streaming API</font></h1>
+						</header>
+
+						<h3> I)	DESCRIPTION: </h3>
+
+						<p>
+
+						In this project, we are going to work with Lambda Architecture to manage and analyse Big Data streaming, so first we are going to set up our
+						system to work with Apache Spark and Apache Cassandra, then we are going to use Apache Spark's Streaming API to perform live streaming computations
+						of the real-time views, and store the results in Apache Cassandra.
+						We will be using the CRAN package download logs <a href = "http://cran-logs.rstudio.com" target="_blank"> 'http://cran-logs.rstudio.com'</a>.
+						These log files contain all hits to <a href = "http://cran.rstudio.com" target="_blank"> 'http://cran.rstudio.com'</a> mirror related
+						to downloads of the R packages. The raw log files have been parsed into CSV file. Since these logs contain a massive amount of data
+						(from 2012 to date), I will only be using the one which was uploaded on the 20th November 2018, you can use a recent one. This log is available to
+						download at <a href = "http://cran-logs.rstudio.com/2018/2018-11-20.csv.gz" target="_blank"> 'http://cran-logs.rstudio.com/2018/2018-11-20.csv.gz'</a>.
+						.<br />
+
+						</p>
+
+						<h3>  II)	SETTING UP THE REQUIRED SYSTEM: </h3>
+
+						<p>
+						When we talk about Big Data, the traditional systems don't meet the requirements needed to handle it, and there is not a single tool
+						that provides a complete solution, for that reason is needed to use a variety of tools and techniques to build a complete Big Data system.
+						</p>
+
+						<p>
+						To build our Big Data system we are going to work with the concept of Lambda Architecture, which consists of a series of layers, each
+						layer satisfies a subset of the properties to satisfy the needs for a robust system that is fault-tolerant, both against hardware failures
+						and human mistakes, being able to serve a wide range of workloads.
+						</p>
+
+						<p>
+						The layers in Lambda Architecture are three, described as follow:<br/><br/>
+
+							<span style="color:blue;font-weight:bold"> Batch Layer  --> </span> Manages the master dataset (an immutable, append-only raw data),
+							Pre-compute the batch views. <br/>
+
+							<span style="color:blue;font-weight:bold"> Serving Layer --> </span> Indexes the batch views so they can be queried in low-latency,
+							ad-hoc way.<br/>
+
+							<span style="color:blue;font-weight:bold"> Speed Layer --> </span> Compensates for the high latency of updates to the serving layers,
+							Deals with recent data only.<br/><br/>
+
+						The following graphic shows this architecture:
+
+							<center><img src="images/thumbs/P2_A.jpg" alt="" style="width:400px;height:350px;"></center>
+						</p>
+
+						<p>
+						In this project, we are going to work in the Speed Layer with Apache Spark's Streaming API and Serving Layer with Apache Cassandra,
+						so we need to set up our Linux system 'UBUNTU', also, you can work with Virtual Box-Virtual Machines 'VM' in the top of your windows
+						system. <br/><br/>
+
+						Firstly, we are going to set up Apache Spark and link it with Jupiter notebook; secondly, set up Cassandra and link with Jupiter notebook,
+						and finally, we will set up Apache Spark Streaming
+
+						</p>
+
+						<h3>FIRST: Setting up Apache Spark:</h3>
+
+						<p> In your prompt/shell write the next Linux Command lines.<br/><br/>
+
+							1. Download the software: <br/>
+
+							<font size="2"> wget https://www-eu.apache.org/dist/spark/spark-2.3.2/spark-2.3.2-bin-hadoop2.7.tgz </font> <br/><br/>
+
+							2. unzip it: <br/>
+
+							<font size="2"> tar -xzf spark-2.3.2-bin-hadoop2.7.tgz </font> <br/><br/>
+
+							3. move it to the folder you will work in my case --> /usr/local/ <br/>
+
+							<font size="2"> mv spark-2.3.2-bin-hadoop2.7 spark </font> <br/>
+							<font size="2"> sudo mv spark /usr/local/ </font> <br/><br/>
+
+							Note: The sudo command allows you to run programs with the security privileges of another user (by default, as the super user) <br/><br/>
+
+							4. Set the environment variables:<br/>
+
+							<font size="2"> sudo nano ~/.bashrc </font> <br/><br/>
+
+							Note: This command opens the .bashrc file with nano text editor  <br/><br/>
+
+
+							5. Add the following lines in the opened file: <br/>
+
+							<font size="2"> export SPARK_HOME=/usr/local/spark </font> <br/>
+							<font size="2"> export PATH=$PATH:$SPARK_HOME/bin </font> <br/><br/>
+
+							6. Reload bashrc: <br/>
+							<font size="2"> source ~/.bashrc </font> <br/><br/>
+
+							7. Now we want to make Jupyter Notebook work with Spark - install/check if python is installed: <br/>
+
+							<font size="2"> python3 - version </font> <br/><br/>
+
+							8. Now install PIP which is a package manager for Python packages, or modules; we use python3 instead default (e.g. 2.7.): <br/>
+
+							<font size="2"> wget https://bootstrap.pypa.io/get-pip.py </font> <br/><br/>
+
+							9. Run get-pip.py <br/>
+							<font size="2"> python3 get-pip.py </font> <br/><br/>
+
+							10. Now check PIP version <br/>
+
+							<font size="2"> pip - version </font> <br/><br/>
+
+							you should see this: <br/>
+
+							<font size="2">pip 18.1 from /usr/local/lib/python3.5/dist-packages/pip (python 3.5) </font> <br/><br/>
+
+							11. Now install Jupyter <br/>
+
+							<font size="2"> sudo -H pip install jupyter </font> <br/><br/>
+
+							12. Check jupyter version <br/>
+
+							<font size="2"> jupyter-version </font> <br/><br/>
+
+							you should see this:   4.4.0
+
+							13. Set the environment variables - linking PySpark with Jupyter Notebook, again access the .bashrc file. <br/>
+
+							<font size="2"> sudo nano ~/.bashrc </font> <br/><br/>
+
+							14. Add the following lines <br/>
+
+							<font size="2"> PYSPARK_DRIVER_PYTHON="jupyter" </font> <br/>
+							<font size="2"> PYSPARK_DRIVER_PYTHON_OPTS="notebook" </font> <br/><br/>
+
+							15. Test your installation. <br/>
+							<font size="2"> Run -> pyspark </font>
+						</p>
+
+						<h3>SECOND: Setting up Apache Cassandra </h3>
+
+						<h4> A)	Setting up Cassandra: </h4>
+
+						<p>
+							The Apache Cassandra database provides you with scalability and high availability without compromising performance. In this project,
+							we use Apache Cassandra at Serving Layer of the Lambda Architecture. Check out the official installation instructions at:
+
+							<a href = "http://cassandra.apache.org/doc/latest/getting_started/installing.html" target="_blank"> 'http://cassandra.apache.org/doc/latest/getting_started/installing.html'</a> <br/><br/>
+
+
+							1.	You need Java 8, either the Oracle Java Standard Edition 8 or OpenJDK 8. To verify that you have the correct version of java installed, type. <br/>
+
+							<font size="2"> java -version </font> <br/><br/>
+
+							2.	For using cqlsh, you need Python To verify that you have the correct version of Python installed, type: <br/>
+
+							<font size="2"> python --version. </font> <br/><br/>
+
+							3.	Run the following commands in your Ubuntu Shell to download Cassandra: <br/>
+
+							<font size="2"> wget https://www-eu.apache.org/dist/cassandra/3.11.3/apache-cassandra-3.11.3-bin.tar. </font> <br/>
+							<font size="2"> tar -xvf apache-cassandra-3.11.3-bin.tar.gz </font> <br/>
+							<font size="2"> mv apache-cassandra-3.11.3 cassandra </font> <br/>
+							<font size="2"> sudo mv cassandra /usr/local/ </font> <br/> <br/>
+
+							4.	Set the path <br/>
+
+							<font size="2"> sudo nano ~/.bashrc </font> <br/><br/>
+
+							5.	Add the following lines <br/>
+
+							<font size="2"> export CASSANDRA_HOME=/usr/local/cassandra </font> <br/>
+							<font size="2"> export PATH=$PATH:$CASSANDRA_HOME/bin </font> <br/><br/>
+
+							6.	Reload .bashrc <br/>
+							<font size="2"> source ~/.bashrc </font> <br/>
+
+						</p>
+
+						<h4> B)	Getting Started with Cassandra: </h4>
+
+						<p>
+
+							1.	Start Cassandra in the foreground by invoking: <br/>
+
+							<font size="2"> cassandra -f </font> <br/><br/>
+
+							You can press Control-C to stop Cassandra. <br/><br/>
+
+							2.	Verify that Cassandra is running by invoking:<br/>
+
+							<font size="2"> nodetool status </font> <br/> <br/>
+
+							3.	Now that you have Cassandra running, the next thing to do is connect to the Cassandra server and begin creating database objects.
+							You can connect to Cassandra using the next command in your shell, and you will be in Cassandra:<br/>
+
+							<font size="2"> Cqlsh </font> <br/><br/>
+
+							4.	From here is similar like SQL, first, create a keyspace: <br/>
+
+							<font size="2"> CREATE KEYSPACE mykeyspace </font> <br/>
+							<font size="2"> WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };</font> <br/><br/>
+
+							* This will create the namespace for tables called mykeyspace. It uses a simple strategy for replication and only one copy
+							will be stored, like SQL server. <br/><br/>
+
+							5.	You can view all the keyspaces: <br/>
+
+							<font size="2"> DESCRIBE KEYSPACES;</font> <br/><br/>
+
+							6.	To work with keyspaces, we have to select one: <br/>
+
+							<font size="2"> USE mykeyspace; </font> <br/><br/>
+
+							7.	We can create tables in a very similar way as in RDBMS: <br/>
+
+							<font size="2"> CREATE TABLE users ( </font> <br/>
+							<font size="2"> user_id int PRIMARY KEY, </font> <br/>
+							<font size="2"> fname text, </font> <br/>
+							<font size="2"> lname text </font> <br/>
+							<font size="2"> ); </font> <br/><br/>
+
+							8.	Inserts are also easy to perform: <br/>
+
+							<font size="2"> INSERT INTO users (user_id, fname, lname) VALUES (1, 'john', 'smith'); </font> <br/><br/>
+
+							9.	Now here we can query data for example from the keyspace ='streaming' and table q4, like the above figure; and we can do
+							all sort of computations like SQL. </p>
+
+
+						<center><img src="images/thumbs/P2_B.jpg" alt="" style="width:500px;height:100px;"></center>
+
+
+						<h4> C)	Linking Spark and Cassandra </h4>
+
+						<p>
+							Before we can use Cassandra database from Spark, we have to enable the Cassandra connector. The connector itself will be downloaded
+							at the first time it is used. If you use pySpark, the only thing you have to do is to add packages parameters when you run it, so
+							every time you want to initialise pySpark with Cassandra use the next command in your shell:<br/>
+
+									<font size="2">pyspark --packages datastax:spark-cassandra-connector:2.3.1-s_2.11 \ </font> <br/>
+									<font size="2">--conf spark.cassandra.connection.host=127.0.0.1 </font>
+
+						<h4> D)	Working with Cassandra from Spark </h4>
+
+
+							1)	Before we start using Cassandra from Spark, we need to have keyspace, table and some data in Cassandra, we have to create it
+								through 'cqlsh'. <br/><br/>
+
+							2)	To read a DataFrame out of Cassandra, we use spark.read.format method, together with load() where we pass our keyspace name and
+								the table we want to use, put the following code snippet in your Jupiter notebook: <br/>
+
+								<font size="2"> user = spark.read.format("org.apache.spark.sql.cassandra")\</font> <br/>
+								<font size="2"> .load(keyspace="training", table="user")</font> <br/><br/>
+
+								*user could be any name.<br/><br/>
+
+							3)	As we created a normal Spark DataFrame, we can perform different operations on it, like:<br/>
+
+										<font size="2"> adults = user.where(user.age > 21)</font> <br/>
+										<font size="2"> adults.show()</font> <br/></br>
+
+							4)	In order to write DataFrame to a Cassandra table, we need to create the table itself first in the cqlsh, then we can write the
+								data using the following sequence of commands: <br/>
+
+								<font size="2"> user.select("age", "user_id", "name")\ .write.format("org.apache.spark.sql.cassandra")\ </font> <br/>
+								<font size="2"> .options(table="users_by_age", keyspace="training").save(mode="append")</font> <br/><br/>
+
+								*It selects few columns from the 'user' dataFrame and then it writes them to the keyspace and the table specified in the
+								'options'. In this example, we append the results to the table 'users_by_age'.<br/>
+						</p>
+
+
+						<h3> III)	DEVELOPMENT OF THE PROJECT </h3>
+
+
+						<p>Now that we have our system ready, we can start working with Apache Spark's  Streaming API, as we mentioned before we are interested
+							in real-time processing of the CRAN package download logs and the results should persist in the Cassandra storage.
+
+
+						<h4> A)	Downloading the Data 'CRAN package download logs': </h4>
+
+
+							First, we need to download the data that contains all hits related to the downloads of the R packages, as we mentioned before this
+							data is parsed in a CSV file and we will only be using the recent one which was uploaded on the 20th November, 2018. This log is
+							available to download at
+							<a href = "http://cran-logs.rstudio.com/2018/2018-11-20.csv.gz" target="_blank"> 'http://cran-logs.rstudio.com/2018/2018-11-20.csv.gz'</a>
+
+						</p>
+						<h4>Loading and Parsing the Data  </h4>
+						<p> This section is purely to analyse the data and the transformations we will need to do when we will be performing streaming computation; That being said,
+						we are going to use the method 'sc.textFile' to load our data, this method takes a URI for the file which is a local path of the file, then it reads the data
+						as a collections of lines.
+						</p>
+							<center><img src="images/thumbs/P2_C.jpg" alt="" style="width:500px;height:40px;"></center>
+
+						<p>Now we can have a look at the first 5 lines in 'downloads_RDD'.	</p>
+
+								<center><img src="images/thumbs/P2_D.jpg" alt="" style="width:600px;height:100px;"></center>
+
+						<p>
+						As we can see in the above code snippet, each line has comma-separated-values, and there are double quotation marks in the transformed downloads RDD,
+						so we will split it by comma, and remove these double quotation marks, as it is shown in the following code snippet.
+						</p>
+
+						<center><img src="images/thumbs/P2_E.jpg" alt="" style="width:500px;height:40px;"></center>
+						<center><img src="images/thumbs/P2_F.jpg" alt="" style="width:700px;height:300px;"></center>
+
+						<p>
+						The package download logs contain data about the following variables; please refer to
+						<a href="https://github.com/Pamelanf/Performing-computation-on-Real-Time-Views-with-Apache-Spark-Streaming/blob/master/csvSplit.ipynb" target="_blank">"my GitHub"</a>
+						 PART I, to see the full code.<br/><br/>
+
+
+						<span style="color:blue;font-weight:bold"> date: </span>Download date<br/>
+						<span style="color:blue;font-weight:bold"> time: </span>Download time (in UTC)<br/>
+						<span style="color:blue;font-weight:bold"> size: </span>Package size (in bytes)<br/>
+						<span style="color:blue;font-weight:bold"> r_version: </span> Version of R used to download package<br/>
+						<span style="color:blue;font-weight:bold"> r_arch: </span> Processor architecture (i386 = 32 bit, x86_64 = 64 bit)<br/>
+						<span style="color:blue;font-weight:bold"> r_os: </span> Operating System (darwin9.8.0 = mac, mingw32 = windows)<br/>
+						<span style="color:blue;font-weight:bold"> package: </span> Name of the package downloaded<br/>
+						<span style="color:blue;font-weight:bold"> country: </span>Two letter ISO country code<br/>
+						<span style="color:blue;font-weight:bold"> ip_id: </span> A daily unique id assigned to each IP address<br/>
+
+
+						</p>
+
+						<h4> B)	Performing computation with Apache Spark Streaming API:</h4>
+						<h4> Emulate a live-Stream: </h4>
+
+						<p>
+						First, we need to emulate a live-stream of the download logs, so it is needed to write a separate Python script that reads 1000 lines
+						every 5 seconds from the original '2018-11-20.csv' file and stores it as separate files (log1, log2, log3, etc.) in the streaming
+						directory(see picture). Please refer to
+						<a href="https://github.com/Pamelanf/Performing-computation-on-Real-Time-Views-with-Apache-Spark-Streaming/blob/master/csvSplit.ipynb" target="_blank">"my GitHub"</a>,
+						part II, to see this Python code.</br>
+
+						The below graphic shows these logs.
+
+						</p>
+
+						<center><img src="images/thumbs/P2_H.jpg" alt="" style="width:650px;height:300px;"></center>
+
+						<p>
+
+						Note: One important thing to be aware is this script has to be running while we run the streaming computations, as we are emulating a
+						live-Stream.
+						</p>
+
+						<h4>Preparing the Streaming Application:</h4>
+
+						<p>
+						In this section we will prepare the streaming application to read the data streams from the streaming directory using a batch length of 5 seconds, so we
+						need to import the next libraries:
+						</p>
+
+						<center><img src="images/thumbs/P2_I.jpg" alt="" style="width:450px;height:90px;"></center>
+
+						<p>
+						Afterwards, we define the def load() function (code snippet below) where we use 'textFileStream' to listen on the streaming directory then we perform the same
+						transformation that we did in the <span style="font-weight:bold"> 'Loading and Parsing the Data'</span> section, but this time in every
+						streaming log file.
+						</p>
+
+						<center><img src="images/thumbs/P2_J.jpg" alt="" style="width:500px;height:200px;"></center>
+
+						<h4> Starting, Computing, and Saving Streaming Computations </h4>
+						<p>
+						In this section, we will define the following streaming computations:<br/><br/>
+
+						1. To calculate the number of downloads of each package.<br/>
+						2. To find the top most downloaded package. <br/>
+						3. To find the top 5 countries along with a number of downloads.<br/>
+						4. To find the number of downloads for ggplot2 package.<br/><br/>
+
+
+						Also, we will save the results in Cassandra, to do this we are going to use the 'foreachRDD' method, which is the most generic output
+						operator that processes each RDD of the Dstream by calling the provided function, furthermore, we are going to define a save function
+						which we will be performed in every computation, this function first creates a DataFrame from the rdd and then writes it to the Cassandra
+						storage, see code snippet below.
+
+						</p>
+
+							<center><img src="images/thumbs/P2_K.jpg" alt="" style="width:500px;height:180px;"></center>
+
+						<h4> Preparing Cassandra data structures to store the results </h4>
+
+						<p> A)	In this section we need to use 'cqlsh' shell and perform the same as we did in the section 'B) Getting started with Cassandra'
+						to create our keyspace: streaming and our tables for each computation, as follow:
+						</p>
+
+						<p>
+
+						 <h4>Code to create streaming keyspace: </h4>
+
+
+
+						<font size="2"> CREATE KEYSPACE streaming WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1 };</font><br/>
+
+						<h4> CQL Code to create Tables: </h4>
+
+						<span style="font-weight:bold"> Question1 'q1' </span><br/>
+						<font size="2">:cqlsh:streaming> CREATE TABLE q1 (time text, package text, count int, PRIMARY KEY(time, package));</font><br/><br/>
+
+						*Here we define time and package as Primary Key.
+
+						<span style="font-weight:bold"> Question2 'q2'</span><br/>
+						<font size="2">:cqlsh:streaming> CREATE TABLE q2 (time text, top_most_down_package text, count int, PRIMARY KEY(time, count));</font><br/><br/>
+
+						<span style="font-weight:bold"> Question3 'q3' </span><br/>
+						<font size="2">:cqlsh:streaming> CREATE TABLE q3 (time text, top_5_countries text, count int, PRIMARY KEY(time, count));</font><br/><br/>
+
+						<span style="font-weight:bold"> Question4 'q4' </span><br/>
+						<font size="2">:cqlsh:streaming> CREATE TABLE q4 (time text, package text, count int, PRIMARY KEY(time, package));</font>
+
+						</p>
+
+						<h4 >Question 1. Calculate the number of downloads of each package:</h4>
+
+						<p>
+						In the below code snippet: Firstly, we define our save () function to store the results in Cassandra, in the keyspace 'streaming'
+						and table 'q1'. Secondly, the streaming context is initialised with: 'ssc = StreamingContext(sc, 5)' where the second parameter
+						defines the length of the batch in seconds. Thirdly, we call our load () function to listening from the streaming directory.
+
+						</p>
+
+						<center><img src="images/thumbs/P2_L.jpg" alt="" style="width:800px;height:250px;"></center>
+
+						<p>
+						<span style="font-weight:bold"> Fourth, we compute the streaming computation: </span> See the below code snippet,
+						<span style="font-weight:bold"> first line:</span> We use Spark Map function which takes one element as input and process it according to
+						custom code, in this case (lambda x: (x[6],1) which select the column x[6] 'package: Name of the package downloaded' and assigns the value '1'.</br>
+
+						<span style="font-weight:bold">Second line:</span> We use the reduceByKey function 'down_each_pack = down_each_pack.reduceByKey(lambda a,b: a+b)'
+						and sum up the values associated to each key (package name), with this we finished the computation.
+
+
+						</p>
+
+						<center><img src="images/thumbs/P2_M.jpg" alt="" style="width:450px;height:70px;"></center>
+
+						<p>
+						In the <span style="font-weight:bold"> fifthly </span> step, we use the foreachRDD method to store in Cassandra.
+						'down_each_pack.foreachRDD(save_1)', calling the save function <br/>
+
+						Finally, in the <span style="font-weight:bold"> sixthly </span>step, after we defined the streaming computation, we start the
+						application:
+
+						</p>
+
+						<center><img src="images/thumbs/P2_N.jpg" alt="" style="width:350px;height:90px;"></center>
+
+						<p>
+						It starts the application, waits 30 seconds and stops it. The stopSparkContext parameter
+						defines whether the SparkContext should be stopped when the StreamingContext is stopped.<br/>
+
+						<span style="font-weight:bold"> Notice:</span> We have to start running our application while the code for Emulate a live-Stream is
+						running, as it will process data in real-time streaming which is entering into the streaming directory.
+						Please refer to <a href="https://github.com/Pamelanf/Performing-computation-on-Real-Time-Views-with-Apache-Spark-Streaming/blob/master/Spark_Streaming_API.ipynb" target="_blank">"my GitHub"</a>
+
+						to have access to the full code.
+
+						</p>
+						<h4> Results in Cassandra table q1: </h4>
+						<p> The next picture shows the results stored in Cassandra, table q1.</p>
+
+							<center><img src="images/thumbs/P2_O.jpg" alt="" style="width:700px;height:300px;"></center>
+
+						<h4> Question2. Find the top most downloaded package: </h4>
+
+						<p>
+
+
+						We perform the same steps from the firstly to the thirdly one as we did in question 1, just in the first step we change to table 'q2'.</br>
+
+						<span style="font-weight:bold"> Fourthly,</span> we compute the streaming computation:  In the below code snippet, in the first and
+						second line, we performed the same computation that was explained in the previous question.</br>
+
+						In the <span style="font-weight:bold"> third line</span>, we use the transform function which in Spark Streaming allows us to perform
+						any transformation on underlying RDD's
+						in Stream, in this case, we sort by the highest number(downloads) in the streaming period.</br>
+
+						In the <span style="font-weight:bold"> fourth line</span>, we use the transform function and inside the lambda function, we use
+						'sc.parallelize()' to build a data Frame from RDD and the pick the first one of this data frame which it would be the highest package
+						download in the streaming period.
+
+						</p>
+						<center><img src="images/thumbs/P2_O1.jpg" alt="" style="width:600px;height:100px;"></center>
+
+						<p>
+						The fifthly and sixthly steps are the same as in the previous questions, just we need to call the corresponding save (save_2)
+						function to store in the respective table and also we can change the time that the application will be stopped, to 30, 50, 170, 130,
+						20 sec .. so on.</br></br>
+
+						Please refer to
+						<a href="https://github.com/Pamelanf/Performing-computation-on-Real-Time-Views-with-Apache-Spark-Streaming/blob/master/Spark_Streaming_API.ipynb" target="_blank">"my GitHub"</a>
+						to see the full code.</br></br>
+
+						<span style="font-weight:bold"> Results in Cassandra table q2:</span></br></br>
+
+						The next picture shows the results stored in Cassandra table q2.
+
+
+						</p>
+						<center><img src="images/thumbs/P2_P.jpg" alt="" style="width:700px;height:300px;"></center>
+
+						<h4> Question 3. Find the top 5 countries along with the number of downloads: </h4>
+
+						<p>
+
+						We perform the same steps from the firstly to the thirdly as we did in question 1, just in step one we change to table 'q3'.</br>
+
+						<span style="font-weight:bold"> Fourth </span>, we compute the streaming computation:  In the below code snippet, in the first and
+						second line, we performed the same computation that was explained in question 1.</br>
+
+						In the <span style="font-weight:bold"> third line</span>, we use the transform function which in Spark Streaming allows us to perform
+						any transformation on underlying RDD's in Stream, in this case, we sort by the highest number(downloads) in the streaming period
+						(similar as the previous question).</br>
+
+						In the <span style="font-weight:bold">fourth line </span>, we use the transform function and inside the lambda function, we use
+						'sc.parallelize()' to build a data Frame from RDD and the pick the first one of this data frame which is the five countries with the
+						highest package download in the streaming period (similar as the previous question).</br>
+
+						</p>
+
+						<center><img src="images/thumbs/P2_Q.jpg" alt="" style="width:600px;height:100px;"></center>
+
+						<p>
+						The fifthly and sixthly steps are the same as in question 1, just we need to call the corresponding 'save' function (save_3) to store
+						in the respective table 'q3' and also we can change the time that the application will be stopped, to 30, 50, 170, 130, 20 sec ..
+						so on. </br> </br>
+
+						Please refer to my <a href="https://github.com/Pamelanf/Performing-computation-on-Real-Time-Views-with-Apache-Spark-Streaming/blob/master/Spark_Streaming_API.ipynb" target="_blank">"my GitHub"</a>
+						to see the full code. </br> </br>
+
+						<span style="font-weight:bold"> Results in Cassandra table q3: </span> </br>
+
+
+						The next picture shows the results stored in Cassandra table q3.
+
+						</p>
+
+						<center><img src="images/thumbs/P2_R.jpg" alt="" style="width:700px;height:300px;"></center>
+
+						<h4> Question 4. Find the number of downloads for ggplot2 package </h4>
+
+						<p>
+						We perform the same steps from the firstly to the thirdly as we did in question 1, just in step one we change to table 'q4'. </br>
+
+						<span style="font-weight:bold"> Fourthly,</span> we compute the streaming computation: In the below code snippet, in the first and
+						second line, we performed the same computation that was explained in question 1.</br>
+
+						In the <span style="font-weight:bold"> third line </span> we use the filter function, to filter the 'ggplot2' package.</br>
+
+
+						</p>
+
+						<center><img src="images/thumbs/P2_S.jpg" alt="" style="width:600px;height:100px;"></center>
+
+						<p>
+						The fifthly and sixthly steps are the same as in question 1, just we need to call the corresponding  'save' (save_4)
+						function to store in the respective table 'q4' and also we can change the time that the application will be stopped,
+						to 30, 50, 170, 130, 20 sec .. so on. </br></br>
+
+						Please refer to <a href="https://github.com/Pamelanf/Performing-computation-on-Real-Time-Views-with-Apache-Spark-Streaming/blob/master/Spark_Streaming_API.ipynb" target="_blank">"my GitHub"</a>
+						to see the full code.</br> </br>
+
+						<span style="font-weight:bold"> Results in Cassandra table q4: </span> </br></br>
+
+						The next picture shows the results stored in Cassandra table q4.
+
+
+						</p>
+						<center><img src="images/thumbs/P2_T.jpg" alt="" style="width:700px;height:300px;"></center>
+
+						<h3> IV)	INFERENCE:</h3>
+
+						<p> In this project, we introduced the concept of Lamba Architecture and how to work with it to Manage and Analyse Big Data, we learnt how to
+						set up our system to work with Apache Spark Streaming API and Apache Cassandra, and we have been experienced what is to work with live streaming
+						computations and store these results in Cassandra, verifying that While CQL is similar to SQL in syntax, Cassandra is non-relational, so it has
+						different ways of storing and retrieving data.
+
+						</p>
+
+
+
+						<p>
+							Please refer to the whole project code in my
+							<a href="https://github.com/Pamelanf/Performing-computation-on-Real-Time-Views-with-Apache-Spark-Streaming/blob/master/Spark_Streaming_API.ipynb" target="_blank">"my GitHub"</a>
+
+							repository, also check my Cassandra documentation
+							<a href="https://github.com/Pamelanf/Performing-computation-on-Real-Time-Views-with-Apache-Spark-Streaming/blob/master/CASSANDRA%20CODE%20AND%20COMPUTATIONS.pdf" target="_blank">"here"</a>... thanks. :)
+						</p>
+
+						<div class="fb-like" data-href="https://pamelanf.github.io/project_1.html" data-width="" data-layout="box_count" data-action="like" data-size="small" data-share="false">
+						</div></br><br></br>
+
+					</section>
+
+				<!-- Two-->
+						<ul class="actions">
+												<li><a href="index.html" class="button">HOME</a></li>
+						</ul>
+
+
+			</div>
+
+
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.poptrox.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
