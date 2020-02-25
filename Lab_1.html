@@ -1,0 +1,267 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>WORKING WITH MySQL</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main1.css" />
+	</head>
+	<body class="is-preload">
+
+		<div id="fb-root"></div>
+				<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v5.0">
+		</script>
+
+		<!-- Header -->
+			<!-- <header id="header">
+				<div class="inner">
+					<a href="#" class="image avatar"><img src="images/avatar.jpg" alt="" /></a>
+					<h1><strong>Hello my name is Pamela N. Flores </strong> <br />
+					I am passionate in Data Science<br />
+					 "Big Data, Data Mining", Business Intelligence, and excited to still learning in this fascinated field.  <br />
+					</a>.</h1>
+				</div>
+			</header> -->
+
+		<!-- Main -->
+			<div id="main">
+
+				<!-- One -->
+					<section id="one">
+						<header class="major">
+							<h1 align="center"><font color= "000000">WORKING WITH MySQL </font></h1>
+						</header>
+
+
+
+						<p>
+
+						In this laboratory, we are going to analyse the Employee Data Base with MySQL, to do that first we need to install MySQL server on
+						our machines, there are many sources on the internet where you can find a guide to install it, one I found easy to follow is
+						<a href = "https://www.mysqltutorial.org/install-mysql/" target="_blank"> 'https://www.mysqltutorial.org/install-mysql/'</a>
+						; once we installed our MySQL server we can continue with Part A and B of this lab.
+
+						</p>
+
+						<h3>  Part A:  </h3>
+
+						<p>
+						Download the Employee DataBase which is available at the following link:
+						<a href = "https://github.com/datacharmer/test_db" target="_blank"> 'https://github.com/datacharmer/test_db'</a> </br></br>
+
+						Download the entire directory as a zip (use the clone or download dropdown option).Once downloaded, unzip the file and put in
+						the working directory, in my case
+						<font size="2"> 'C:\Users\Pamela\Desktop\PROJECTS\PORTFOLIO\PROJECTS\1RO LAB\test_db-master'.</font> <br/><br/>
+
+						Before to import the data in your MySQL server, first we need to do some modifications into the employees.sql file otherwise we are going
+						to have problems loading the dump files, then having said this, open employees.sql with any notepad and go to the bottom to modify the source
+						lines for  example in the first source line is written <font size="2">  'source load_departments.dump;' </font>
+						instead, put  the whole path working directory as
+						<font size="2"> 'source C:\Users\Pamela\Desktop\PROJECTS\PORTFOLIO\PROJECTS\1RO LAB\test_db-master\load_departments.dump;'</font> <br/><br/>
+
+						Once we have done this we can import with the source command line, in 'mysql' shell: <br/><br/>
+						<font size="2">  mysql> source C:\Users\Pamela\Desktop\PROJECTS\PORTFOLIO\PROJECTS\1RO LAB\test_db-master\ employees.sql </font> <br/><br/>
+
+						The Employees sample database provides a combination of a large base of data (approximately 160MB) spread over six separate tables and consisting
+						of 4 million records in total. For more details check the following link:
+						<a href = "https://dev.mysql.com/doc/employee/en/" target="_blank"> 'https://dev.mysql.com/doc/employee/en/'</a> </br></br>
+
+						Where you can see the structure of these tables as follow:
+
+						</p>
+
+						<center><img src="images/thumbs/Lab 01_A.jpg" alt="" style="width:600px;height:550px;"></center>
+
+						<h3>  Part B:  </h3>
+						<p>
+						In this section, we are going to write appropriate SQL statements to answer each of the following questions, but firstly
+						let's explore the databases tables:</br></br>
+
+						<font size="2">  mysql>  show tables; </font>
+						</p>
+
+						<center><img src="images/thumbs/Lab 01_B.jpg" alt="" style="width:300px;height:200px;"></center>
+
+						<p>
+
+						The above graphic shows 8 tables however 6 of these tables are the base table (the tables are fixed in the structure) and
+						2 are view tables(virtual tables), see the following graphic.
+
+						<font size="2"> mysql> show full tables; </font>
+
+						<center><img src="images/thumbs/Lab 01_C.jpg" alt="" style="width:300px;height:200px;"></center>
+
+						</p>
+
+						<H3> Questions:</H3>
+
+						<p>
+						1)	Show all available job position titles. </br></br>
+
+						<font size="2">  mysql> SELECT DISTINCT title FROM titles; </font>
+						</p>
+
+						<center><img src="images/thumbs/Lab 01_D.jpg" alt="" style="width:400px;height:800px,"></center>
+
+						<p> <span style="font-weight:bold"> Explanation:</span> In this question, we use the title table and 'SELECT DISTINCT' statement to return only different values of
+						the available positions.
+						</p>
+
+						<p>
+						2)	How many employees work on each position. </br></br>
+
+						<font size="2">  mysql> SELECT title, COUNT (title) FROM titles GROUP BY title; </font>
+						</p>
+
+						<center><img src="images/thumbs/Lab 01_E.jpg" alt="" style="width:450px;height:850px,"></center>
+
+						<p> <span style="font-weight:bold"> Explanation:</span> Here, we use the title table and these are grouped for title to count into these groups.
+						</p>
+
+						<p>
+						3)	What is the average salary for each position? Order the results from the highest average to the lowest.</br></br>
+						<font size="2">  mysql> SELECT titles.title, AVG(salaries.salary) AS 'AVERAGE SALARY' FROM titles INNER JOIN salaries ON
+						titles.emp_no = salaries.emp_no GROUP BY titles.title ORDER BY AVG(salaries.salary) DESC;  </font>
+						</p>
+						<center><img src="images/thumbs/Lab 01_F.jpg" alt="" style="width:500px;height:850px,"></center>
+
+						<p> <span style="font-weight:bold"> Explanation:</span> To answer this question we joined the 'titles' and 'salaries' tables, using INNER JOIN statement, then group by titles to have
+						the average of each position then sorting out from the highest to the lowest value.
+						</p>
+
+						<p>
+						4) Show all departments' name together with the first and last names of department's manager. Sort the list by the last name of the manager.</br></br>
+						<font size="2">  SELECT departments.dept_name, employees.first_name, employees.last_name FROM departments INNER JOIN dept_manager ON
+						departments.dept_no = dept_manager.dept_no INNER JOIN employees ON dept_manager.emp_no = employees.emp_no INNER JOIN titles ON
+						employees.emp_no = titles.emp_no WHERE titles.title = 'manager' ORDER BY employees.last_name ASC;  </font>
+						</p>
+						<center><img src="images/thumbs/Lab 01_G.jpg" alt="" style="width:550px;height:850px,"></center>
+
+						<p> <span style="font-weight:bold"> Explanation:</span> To answer this question, the departments, dept_manager and employees tables were joined, and we filter by selecting just the manager
+						position (title).
+						</p>
+
+						<p>
+						 5) Modify the previous query to show only the current manager of each department. A manager is a current manager if the to date column
+						 is equal to "9999-01-01".</br></br>
+						<font size="2"> SELECT departments.dept_name, employees.first_name, employees.last_name FROM departments INNER JOIN dept_manager ON
+						departments.dept_no = dept_manager.dept_no INNER JOIN employees ON dept_manager.emp_no = employees.emp_no INNER JOIN titles ON
+						employees.emp_no = titles.emp_no WHERE titles.title = 'manager' AND titles.to_date = "9999-01-01" ORDER BY employees.last_name ASC; </font>
+						</p>
+						<center><img src="images/thumbs/Lab 01_H.jpg" alt="" style="width:600px;height:850px,"></center>
+
+						<p> <span style="font-weight:bold"> Explanation:</span> This is the same as the previous question but we added a filter more '  titles.to_date = '9999-01-01''.
+						</p>
+
+						<p>
+						6) What is the average current salary for each position?
+									</br></br>
+						<font size="2"> SELECT titles.title, AVG(salaries.salary) as 'AVERAGE SALARY' FROM titles INNER JOIN salaries ON titles.emp_no
+						= salaries.emp_no WHERE titles.to_date = "9999-01-01" GROUP BY titles.title; </font>
+						</p>
+						<center><img src="images/thumbs/Lab 01_I.jpg" alt="" style="width:600px;height:750px,"></center>
+
+						<p> <span style="font-weight:bold"> Explanation: </span> This question is similar to question 3 but it is filtered by the current position as 'titles.to_date = '9999-01-01''..
+						</p>
+
+						<p> 7) How many Assistant Engineers currently earn more than the average salary of all current employee?.
+															</br></br>
+						<span style="font-weight:bold"> Explanation:</span> To have an idea, first we will query to return a table with the all Assistant Engineers (currently) and their salaries:
+						<font size="2"> SELECT titles.titles, salaries.salary FROM titles INNER JOIN salaries ON titles.emp_no = salaries.emp_no WHERE titles.titles
+						= 'Assistant Engineer' and titles.to_date = "9999-01-01"; </font>
+						</p>
+						<center><img src="images/thumbs/Lab 01_J.jpg" alt="" style="width:300px;height:250px,"></center>
+
+						<p> Second query, the average salary of all current employee.</br></br>
+						<font size="2"> SELECT AVG(salary) FROM salaries WHERE to_date = "9999-01-01";</font>
+
+						</p>
+						<center><img src="images/thumbs/Lab 01_K.jpg" alt="" style="width:500px;height:450px,"></center>
+
+						<p> <span style="font-weight:bold"> FINAL QUERY: </span> </br></br>
+						<font size="2"> SELECT COUNT(*)FROM titles INNER JOIN salaries ON titles.emp_no = salaries.emp_no WHERE titles.title = ‘Assistant Engineer’
+						and titles.to_date = "9999-01-01" and salaries.salary > (SELECT AVG(salary) FROM salaries WHERE to_date = "9999-01-01");</font> </br></br>
+
+						Finally, we nest the second query into the first query, the results as shown below.
+						</p>
+
+						<center><img src="images/thumbs/Lab 01_L.jpg" alt="" style="width:600px;height:650px,"></center>
+
+						<p>
+						8) Show all identifiers of departments that have more than 40000 employees.
+						</br></br>
+						<font size="2"> SELECT departments.dept_no FROM departments INNER JOIN dept_emp ON departments.dept_no = dept_emp.dept_no INNER JOIN
+						employees ON dept_emp.emp_no = employees.emp_no GROUP BY departments.dept_no HAVING COUNT(employees.emp_no)>40000;</font>
+						</p>
+						<center><img src="images/thumbs/Lab 01_M.jpg" alt="" style="width:500px;height:750px,"></center>
+
+						<p> <span style="font-weight:bold"> Explanation:</span> In this question, we join three tables and we filter our result using the 'HAVING' statement as the 'WHERE' statement could
+						not be used with aggregate functions like count.
+						</p>
+
+						<p>
+						9) Is there a difference in the average salaries for males and females?
+						</br></br>
+						<font size="2"> SELECT employees.Gender, AVG(salaries.salary) FROM salaries INNER JOIN employees ON  salaries.emp_no = employees.emp_no GROUP BY
+						employees.gender;</font>
+						</p>
+						<center><img src="images/thumbs/Lab 01_N.jpg" alt="" style="width:600px;height:750px,"></center>
+
+						<p> <span style="font-weight:bold"> Explanation: </span> As the table shows it is slightly different. Here basically we use INNER JOIN to join employees and salaries tables
+						to have the average salary and group by gender.
+						</p>
+
+						<p>
+						10) Show first name, last name, salary and title of all employees with the salary between 38000 and 39000. Sort them by the salary.
+						You want to present only the current job title.
+						</br></br>
+						<font size="2"> SELECT employees.first_name, employees.last_name, salaries.salary, titles.title FROM employees INNER JOIN salaries ON
+						employees.emp_no = salaries.emp_no INNER JOIN titles ON employees.emp_no = titles.emp_no WHERE salaries.salary >= 38000 and salaries.salary
+						<=39000 AND titles.to_date ='9999-01-01' SORT BY salaries.salary;</font>
+						</p>
+						<center><img src="images/thumbs/Lab 01_O.jpg" alt="" style="width:600px;height:550px,"></center>
+
+						<p> <span style="font-weight:bold"> Explanation: </span> the employees, salaries, and titles tables were joined then we filtered the result with the conditions established in
+						the question to finally sort out by salary to the lowest to the highest.
+						</p>
+
+
+
+
+
+
+						<h3> IV)	INFERENCE:</h3>
+
+						<p> In this laboratory we learnt how to install MySQL server, load the Employees DataBase in MySQL server, and perform queries over this  DataBase,
+						using main SQL statements such as INNER JOIN, HAVING, ORDER by, and others.
+						</p>
+
+
+
+
+						<div class="fb-like" data-href="https://pamelanf.github.io/lab_1.html" data-width="" data-layout="box_count" data-action="like" data-size="small" data-share="false">
+						</div></br><br></br>
+
+					</section>
+
+				<!-- Two-->
+						<ul class="actions">
+												<li><a href="index.html" class="button">HOME</a></li>
+						</ul>
+
+
+			</div>
+
+
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.poptrox.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
